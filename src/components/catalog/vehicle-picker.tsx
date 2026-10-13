@@ -84,7 +84,7 @@ export function VehiclePicker({ tree }: { tree: Brand[] }) {
         value={selectedBrandSlug}
         onValueChange={(v) => v && setSelectedBrandSlug(v)}
       >
-        <SelectTrigger size="sm">
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Merek" />
         </SelectTrigger>
         <SelectContent>
@@ -101,7 +101,7 @@ export function VehiclePicker({ tree }: { tree: Brand[] }) {
           value={selectedModelSlug}
           onValueChange={(v) => v && setSelectedModelSlug(v)}
         >
-          <SelectTrigger size="sm">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Model" />
           </SelectTrigger>
           <SelectContent>
@@ -116,7 +116,7 @@ export function VehiclePicker({ tree }: { tree: Brand[] }) {
 
       {selectedModel && (
         <Select value={selectedVariantId} onValueChange={handleVariantSelect}>
-          <SelectTrigger size="sm">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Varian" />
           </SelectTrigger>
           <SelectContent>

@@ -77,7 +77,7 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
   const isOutOfStock = product.stock === 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm mb-8 text-muted-foreground">

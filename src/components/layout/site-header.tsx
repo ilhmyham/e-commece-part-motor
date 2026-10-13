@@ -9,7 +9,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="font-semibold tracking-tight text-lg">
           Toko Part Motor
@@ -24,7 +24,7 @@ export function SiteHeader() {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-secondary rounded-md">
+          <button className="p-2 hover:bg-secondary rounded-md" aria-label="Keranjang">
             <ShoppingCart className="w-5 h-5" />
           </button>
           <button className="px-3 py-1.5 text-sm border border-border rounded-md hover:bg-secondary">
@@ -36,6 +36,7 @@ export function SiteHeader() {
         <button
           className="sm:hidden p-2 hover:bg-secondary rounded-md ml-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Buka menu"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -44,7 +45,7 @@ export function SiteHeader() {
       {/* Mobile nav */}
       {mobileMenuOpen && (
         <div className="sm:hidden border-t border-border bg-background">
-          <div className="container mx-auto px-4 py-3 flex flex-col gap-2">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex flex-col gap-2">
             <Link href="/produk" className="text-sm py-2 hover:text-primary">
               Produk
             </Link>

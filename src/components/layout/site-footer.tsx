@@ -1,7 +1,9 @@
+"use client";
+
 export function SiteFooter() {
   return (
     <footer className="w-full border-t border-border bg-secondary mt-16">
-      <div className="container mx-auto px-4 py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
           <div>
             <h3 className="font-semibold mb-3">Tentang</h3>
@@ -30,7 +32,7 @@ export function SiteFooter() {
             Harga dan kecocokan part adalah data contoh.
           </p>
           <p className="text-xs text-muted-foreground mt-2">
-            © 2024 Toko Part Motor. Semua hak dilindungi.
+            © 2026 Toko Part Motor. Semua hak dilindungi.
           </p>
         </div>
       </div>
