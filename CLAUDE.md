@@ -47,3 +47,9 @@ Better Auth, Drizzle ORM, PostgreSQL, Zod, React Hook Form. Package manager: pnp
 - Ikuti pola yang sudah ada (contoh: src/server/queries/products.ts) untuk penamaan dan struktur.
 - Kode dan nama variabel dalam bahasa Inggris; teks UI dalam bahasa Indonesia.
 - Jawaban singkat. Tidak perlu menjelaskan hal dasar kecuali diminta.
+
+## Status
+- Selesai: setup proyek, skema + migrasi, seed (113 produk), query katalog di src/server/queries.
+- Belum: UI, Better Auth, keranjang, checkout (Midtrans sandbox), admin, gambar produk, "Garasiku".
+- Catatan: product_image masih kosong. Variant ID adalah UUID acak tiap seed, jangan di-hardcode.
+- Pilihan motor disimpan di URL (?variant=<uuid>).

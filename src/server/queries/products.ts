@@ -17,6 +17,10 @@ import {
 } from "@/db/schema";
 import { ListProductsParams } from "@/validators/catalog";
 
+function escapeLike(s: string): string {
+  return s.replace(/[\\_%]/g, (c) => "\\" + c);
+}
+
 export async function listProducts(params: ListProductsParams) {
   // Apply defaults
   const sort = params.sort ?? "newest";
@@ -34,7 +38,8 @@ export async function listProducts(params: ListProductsParams) {
       .limit(1);
 
     if (!cat.length) {
-      throw new Error(`Category not found: ${categorySlug}`);
+      // Soft fail: return empty result
+      return { items: [], total: 0, page, pageSize };
     }
 
     if (!cat[0].parentId) {
@@ -50,7 +55,6 @@ export async function listProducts(params: ListProductsParams) {
     }
   }
 
-  // 1. Build unified conditions array
   const conditions = [eq(product.isActive, true)];
 
   if (categoryIds) {
@@ -58,41 +62,58 @@ export async function listProducts(params: ListProductsParams) {
   }
 
   if (q) {
-    const searchPattern = `%${q}%`;
+    const searchPattern = `%${escapeLike(q)}%`;
     conditions.push(
-      sql`(${product.name} ILIKE ${searchPattern} OR ${product.brand} ILIKE ${searchPattern} OR ${product.sku} ILIKE ${searchPattern})`
+      sql`(${product.name} ILIKE ${searchPattern} OR ${product.brand} ILIKE ${searchPattern} OR ${product.sku} ILIKE ${searchPattern} OR ${product.partNumber} ILIKE ${searchPattern})`
     );
   }
 
-  // 2. Execute COUNT Query safely without reassigning query builder variables
-  let total = 0;
+  // COUNT query: count distinct products matching conditions
+  let countResult;
 
-  if (variantId) {
-    // With fitment join
-    const countResult = await db
-      .select({ count: sql<number>`CAST(COUNT(DISTINCT ${product.id}) AS INTEGER)` })
+  if (q) {
+    // With search filter
+    const searchPattern = `%${escapeLike(q)}%`;
+    countResult = await db
+      .select({ count: sql<number>`COUNT(*) AS count` })
+      .from(product)
+      .where(
+        and(
+          eq(product.isActive, true),
+          categoryIds ? inArray(product.categoryId, categoryIds) : undefined,
+          sql`(${product.name} ILIKE ${searchPattern} OR ${product.brand} ILIKE ${searchPattern} OR ${product.sku} ILIKE ${searchPattern} OR ${product.partNumber} ILIKE ${searchPattern})`
+        )
+      );
+  } else if (variantId) {
+    // With variant filter
+    countResult = await db
+      .select({ count: sql<number>`COUNT(DISTINCT ${product.id}) AS count` })
       .from(product)
       .innerJoin(productFitment, eq(product.id, productFitment.productId))
-      .where(and(...conditions, eq(productFitment.variantId, variantId)));
-    total = countResult[0]?.count ?? 0;
+      .where(
+        and(
+          eq(product.isActive, true),
+          categoryIds ? inArray(product.categoryId, categoryIds) : undefined,
+          eq(productFitment.variantId, variantId)
+        )
+      );
   } else {
-    // Standard count
-    const countResult = await db
-      .select({ count: sql<number>`CAST(COUNT(*) AS INTEGER)` })
+    // No search or variant, just active + category
+    countResult = await db
+      .select({ count: sql<number>`COUNT(*) AS count` })
       .from(product)
-      .where(and(...conditions));
-    total = countResult[0]?.count ?? 0;
+      .where(
+        and(
+          eq(product.isActive, true),
+          categoryIds ? inArray(product.categoryId, categoryIds) : undefined
+        )
+      );
   }
 
-  // 3. Execute DATA Query
-  const orderByParam = sort === "price_asc"
-    ? product.price
-    : sort === "price_desc"
-      ? desc(product.price)
-      : desc(product.createdAt);
+  const total = countResult[0]?.count ?? 0;
 
-  // Setup base query definitions
-  const baseQuery = db
+  // Data query with correlated subqueries for images (no join)
+  let dataQuery = db
     .select({
       id: product.id,
       sku: product.sku,
@@ -105,41 +126,38 @@ export async function listProducts(params: ListProductsParams) {
       weightGram: product.weightGram,
       condition: product.condition,
       categoryName: category.name,
-      imageUrl: productImage.url,
-      imageAlt: productImage.alt,
+      imageUrl: sql<string | null>`(SELECT ${productImage.url} FROM ${productImage} WHERE ${productImage.productId} = ${product.id} ORDER BY ${productImage.sortOrder} ASC LIMIT 1)`,
+      imageAlt: sql<string | null>`(SELECT ${productImage.alt} FROM ${productImage} WHERE ${productImage.productId} = ${product.id} ORDER BY ${productImage.sortOrder} ASC LIMIT 1)`,
     })
     .from(product)
-    .innerJoin(category, eq(product.categoryId, category.id))
-    .leftJoin(productImage, eq(product.id, productImage.productId));
-
-  let rows;
+    .innerJoin(category, eq(product.categoryId, category.id));
 
   if (variantId) {
-    // Branch A: Apply Join + Execute
-    rows = await baseQuery
-      .innerJoin(productFitment, eq(product.id, productFitment.productId))
-      .where(and(...conditions, eq(productFitment.variantId, variantId)))
-      .orderBy(orderByParam)
-      .limit(pageSize)
-      .offset((page - 1) * pageSize);
-  } else {
-    // Branch B: Standard Query + Execute
-    rows = await baseQuery
-      .where(and(...conditions))
-      .orderBy(orderByParam)
-      .limit(pageSize)
-      .offset((page - 1) * pageSize);
+    dataQuery = dataQuery
+      .innerJoin(
+        productFitment,
+        and(
+          eq(product.id, productFitment.productId),
+          eq(productFitment.variantId, variantId)
+        )
+      );
   }
 
-  // Deduplicate products (if product has multiple images or multiple fitments)
-  const seen = new Set<string>();
-  const items = rows.filter((row) => {
-    if (seen.has(row.id)) return false;
-    seen.add(row.id);
-    return true;
-  });
+  // Apply sorting with secondary sort by product.id
+  const orderConditions =
+    sort === "price_asc"
+      ? [product.price, product.id]
+      : sort === "price_desc"
+        ? [desc(product.price), product.id]
+        : [desc(product.createdAt), product.id];
 
-  return { items, total, page, pageSize };
+  const rows = await dataQuery
+    .where(and(...conditions))
+    .orderBy(...orderConditions)
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+
+  return { items: rows, total, page, pageSize };
 }
 
 export async function getProductBySlug(slug: string) {
@@ -188,7 +206,7 @@ export async function getProductBySlug(slug: string) {
     }))
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
-  // Query 2: product + fitments + variants + models + brands
+  // Query 2: product fitments → variants → models → brands
   const fitmentRows = await db
     .select({
       variantId: motorcycleVariant.id,
@@ -196,10 +214,11 @@ export async function getProductBySlug(slug: string) {
       yearFrom: motorcycleVariant.yearFrom,
       yearTo: motorcycleVariant.yearTo,
       modelSlug: motorcycleModel.slug,
+      modelName: motorcycleModel.name,
       brandSlug: motorcycleBrand.slug,
+      brandName: motorcycleBrand.name,
     })
-    .from(product)
-    .leftJoin(productFitment, eq(product.id, productFitment.productId))
+    .from(productFitment)
     .leftJoin(
       motorcycleVariant,
       eq(productFitment.variantId, motorcycleVariant.id)
@@ -209,7 +228,7 @@ export async function getProductBySlug(slug: string) {
       eq(motorcycleVariant.modelId, motorcycleModel.id)
     )
     .leftJoin(motorcycleBrand, eq(motorcycleModel.brandId, motorcycleBrand.id))
-    .where(eq(product.id, firstRow.id));
+    .where(eq(productFitment.productId, firstRow.id));
 
   // Group variants by brand → model
   const variantsByBrandModel = new Map<
@@ -235,7 +254,9 @@ export async function getProductBySlug(slug: string) {
   // Sort variants within each model
   const variants: Array<{
     brandSlug: string;
+    brandName: string;
     modelSlug: string;
+    modelName: string;
     items: Array<{
       variantId: string;
       name: string;
@@ -249,7 +270,9 @@ export async function getProductBySlug(slug: string) {
       const sorted = rows.sort((a, b) => (a.yearFrom ?? 0) - (b.yearFrom ?? 0));
       variants.push({
         brandSlug,
+        brandName: sorted[0].brandName!,
         modelSlug,
+        modelName: sorted[0].modelName!,
         items: sorted.map((r) => ({
           variantId: r.variantId!,
           name: r.variantName!,
