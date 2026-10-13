@@ -32,6 +32,7 @@ export function ProductGrid({
 }: ProductGridProps) {
   const searchParams = useSearchParams();
   const totalPages = Math.ceil(total / pageSize);
+  const variantId = searchParams.get("variant") || undefined;
 
   const createPageLink = (p: number) => {
     const params = new URLSearchParams(searchParams);
@@ -63,6 +64,7 @@ export function ProductGrid({
             key={product.id}
             {...product}
             fitmentVariant={fitmentVariantName}
+            fitmentVariantId={variantId}
           />
         ))}
       </div>

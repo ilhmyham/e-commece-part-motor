@@ -11,6 +11,7 @@ interface ProductCardProps {
   imageUrl: string | null;
   imageAlt: string | null;
   fitmentVariant?: string;
+  fitmentVariantId?: string;
   slug: string;
 }
 
@@ -21,10 +22,15 @@ export function ProductCard({
   imageUrl,
   imageAlt,
   fitmentVariant,
+  fitmentVariantId,
   slug,
 }: ProductCardProps) {
+  const href = fitmentVariantId
+    ? `/produk/${slug}?variant=${fitmentVariantId}`
+    : `/produk/${slug}`;
+
   return (
-    <a href={`/produk/${slug}`} className="group">
+    <a href={href} className="group">
       <Card className="overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer h-full flex flex-col">
         <div className="relative w-full aspect-square bg-muted flex-shrink-0">
           {imageUrl ? (

@@ -179,6 +179,7 @@ export async function getProductBySlug(slug: string) {
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       categoryName: category.name,
+      categorySlug: category.slug,
       imageId: productImage.id,
       imageUrl: productImage.url,
       imageAlt: productImage.alt,
@@ -299,6 +300,7 @@ export async function getProductBySlug(slug: string) {
     createdAt: firstRow.createdAt,
     updatedAt: firstRow.updatedAt,
     categoryName: firstRow.categoryName,
+    categorySlug: firstRow.categorySlug,
     images,
     variants,
   };
