@@ -57,32 +57,34 @@ export default async function ProductPage(props: { searchParams: SearchParams })
   }));
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold tracking-tight">Produk</h1>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar - desktop only */}
-        <div className="hidden lg:block">
-          <FilterSidebar categories={flatCategories} vehicleTree={vehicleTree} />
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold tracking-tight">Produk</h1>
         </div>
 
-        {/* Main content */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
-          {/* Filter dialog - mobile only */}
-          <div className="lg:hidden">
-            <FilterDialog categories={flatCategories} vehicleTree={vehicleTree} />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar - desktop only */}
+          <div className="hidden lg:block">
+            <FilterSidebar categories={flatCategories} vehicleTree={vehicleTree} />
           </div>
 
-          {/* Products */}
-          <ProductGrid
-            products={products.items}
-            total={products.total}
-            page={products.page}
-            pageSize={products.pageSize}
-            fitmentVariantName={fitmentVariantName}
-          />
+          {/* Main content */}
+          <div className="lg:col-span-3 flex flex-col gap-6">
+            {/* Filter dialog - mobile only */}
+            <div className="lg:hidden">
+              <FilterDialog categories={flatCategories} vehicleTree={vehicleTree} />
+            </div>
+
+            {/* Products */}
+            <ProductGrid
+              products={products.items}
+              total={products.total}
+              page={products.page}
+              pageSize={products.pageSize}
+              fitmentVariantName={fitmentVariantName}
+            />
+          </div>
         </div>
       </div>
     </div>

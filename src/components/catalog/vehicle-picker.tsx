@@ -80,7 +80,6 @@ export function VehiclePicker({ tree }: { tree: Brand[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="text-sm font-semibold">Pilih Motor</h3>
       <Select
         value={selectedBrandSlug}
         onValueChange={(v) => v && setSelectedBrandSlug(v)}
@@ -136,10 +135,10 @@ export function VehiclePicker({ tree }: { tree: Brand[] }) {
           variant="outline"
           size="sm"
           onClick={handleClear}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 h-8"
         >
-          <X className="w-4 h-4" />
-          Hapus pilihan motor
+          <X className="w-3 h-3" />
+          Hapus
         </Button>
       )}
     </div>

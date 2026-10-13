@@ -86,23 +86,30 @@ export function FilterSidebar({
     <div className="flex flex-col gap-6">
       {/* Search */}
       <form onSubmit={handleSearch} className="flex flex-col gap-2">
-        <Label className="text-sm font-semibold">Cari</Label>
+        <Label className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">Cari</Label>
         <Input
           type="text"
           placeholder="Nama atau part number"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch(e)}
-          className="text-sm"
+          className="text-sm h-8"
         />
       </form>
 
+      <div className="border-t border-border pt-6" />
+
       {/* Vehicle Picker */}
-      <VehiclePicker tree={vehicleTree} />
+      <div className="flex flex-col gap-3">
+        <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">Pilih Motor</h3>
+        <VehiclePicker tree={vehicleTree} />
+      </div>
+
+      <div className="border-t border-border pt-6" />
 
       {/* Category */}
       <div className="flex flex-col gap-2">
-        <Label className="text-sm font-semibold">Kategori</Label>
+        <Label className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">Kategori</Label>
         <Select
           value={searchParams.get("category") || ""}
           onValueChange={handleCategoryChange}
@@ -128,9 +135,11 @@ export function FilterSidebar({
         </Select>
       </div>
 
+      <div className="border-t border-border pt-6" />
+
       {/* Sort */}
       <div className="flex flex-col gap-2">
-        <Label className="text-sm font-semibold">Urutan</Label>
+        <Label className="text-xs font-semibold uppercase text-muted-foreground tracking-wide">Urutan</Label>
         <Select
           value={searchParams.get("sort") || ""}
           onValueChange={handleSortChange}

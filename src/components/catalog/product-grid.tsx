@@ -43,7 +43,7 @@ export function ProductGrid({
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
-          <p className="text-muted-foreground text-lg">Tidak ada produk ditemukan</p>
+          <p className="text-muted-foreground text-sm">Tidak ada produk ditemukan</p>
         </div>
       </div>
     );
@@ -51,10 +51,10 @@ export function ProductGrid({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Product count */}
-      <p className="text-sm text-muted-foreground">
+      {/* Header: product count */}
+      <div className="text-sm text-muted-foreground">
         Menampilkan {products.length} dari {total} produk
-      </p>
+      </div>
 
       {/* Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -69,7 +69,7 @@ export function ProductGrid({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 flex-wrap mt-4">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           {page > 1 && (
             <a href={createPageLink(page - 1)}>
               <Button variant="outline" size="sm">
@@ -84,7 +84,7 @@ export function ProductGrid({
             .map((p, i, arr) => {
               if (i > 0 && arr[i - 1] !== p - 1) {
                 return (
-                  <span key={`dots-${p}`} className="text-muted-foreground">
+                  <span key={`dots-${p}`} className="text-muted-foreground text-sm px-1">
                     ...
                   </span>
                 );
@@ -94,7 +94,7 @@ export function ProductGrid({
                   <Button
                     variant={p === page ? "default" : "outline"}
                     size="sm"
-                    className="w-8 h-8"
+                    className="w-8 h-8 p-0"
                   >
                     {p}
                   </Button>
