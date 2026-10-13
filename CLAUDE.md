@@ -53,3 +53,10 @@ Better Auth, Drizzle ORM, PostgreSQL, Zod, React Hook Form. Package manager: pnp
 - Belum: UI, Better Auth, keranjang, checkout (Midtrans sandbox), admin, gambar produk, "Garasiku".
 - Catatan: product_image masih kosong. Variant ID adalah UUID acak tiap seed, jangan di-hardcode.
 - Pilihan motor disimpan di URL (?variant=<uuid>).
+
+## UI
+- Gaya: teknis & tegas, hanya mode terang, tanpa dark mode.
+- Warna utama biru (token --primary di globals.css), font Inter, radius 0.375rem.
+- Pakai token shadcn, jangan hardcode warna.
+- Filter katalog disimpan di URL searchParams.
+- Komponen fitur katalog ada di src/components/catalog/.
