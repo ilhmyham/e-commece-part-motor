@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FilterSidebar } from "./filter-sidebar";
 import { Sliders } from "lucide-react";
 
@@ -39,21 +39,25 @@ export function FilterDialog({
   const [open, setOpen] = useState(false);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Button variant="outline" size="sm">
-          <Sliders className="w-4 h-4" />
-          Filter
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Filter Produk</DialogTitle>
-        </DialogHeader>
-        <div className="overflow-y-auto max-h-[70vh]">
-          <FilterSidebar categories={categories} vehicleTree={vehicleTree} />
-        </div>
-      </DialogContent>
-    </Dialog>
+    <>
+      {/* 1. Tombol diletakkan di luar Dialog, gunakan onClick biasa */}
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+        <Sliders className="w-4 h-4" />
+        Filter
+      </Button>
+
+      {/* 2. Dialog hanya membungkus konten popup saja */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Filter Produk</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-[70vh]">
+            <FilterSidebar categories={categories} vehicleTree={vehicleTree} />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
+
 }

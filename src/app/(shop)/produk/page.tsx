@@ -6,8 +6,6 @@ import { FilterSidebar } from "@/components/catalog/filter-sidebar";
 import { FilterDialog } from "@/components/catalog/filter-dialog";
 import { ProductGrid } from "@/components/catalog/product-grid";
 
-export const instant = false;
-
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function ProductPage(props: { searchParams: SearchParams }) {

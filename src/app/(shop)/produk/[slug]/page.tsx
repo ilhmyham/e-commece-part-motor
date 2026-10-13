@@ -10,8 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { VehiclePicker } from "@/components/catalog/vehicle-picker";
 
-export const instant = false;
-
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
